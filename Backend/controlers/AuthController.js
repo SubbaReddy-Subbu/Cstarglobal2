@@ -1,4 +1,20 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv').config()
+
+const SecreteKey = process.env.SECRETEKEY
+
+const Authjwt = async (req,res,next)=>{
+    const token = req.header("Authorization");
+    if(!token){
+        return res.status(401).json({message : "Unauthorized"})
+    }jwt.verify(token,SecreteKey,(err,user)=>{
+        if(err){
+            res.status(403).json({message : "invalid token"})
+        }req.user = user;
+        next()
+    })
+}
 
 const Login = async (req, res) => {
     const { email, password } = req.body;
@@ -10,7 +26,10 @@ const Login = async (req, res) => {
             const verify = existingUser.password === password;
 
             if (verify) {
-                res.status(200).json({ message: `Welcome ${existingUser.userName}` });
+                const tokenUser ={name :  existingUser.userName }
+                const accessToken = jwt.sign(tokenUser,SecreteKey);
+
+                res.status(200).json({ message: `Welcome ${existingUser.userName}`,accessToken });
             } else {
                 res.status(403).json({ message: "Incorrect details" });
             }
@@ -65,4 +84,4 @@ const Delete = async (req,res)=>{
     }
 }
 
-module.exports = { Login, Register,Delete };
+module.exports = { Login, Register,Delete,Authjwt };
