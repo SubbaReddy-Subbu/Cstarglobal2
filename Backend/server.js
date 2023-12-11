@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const Article = require('./models/Article')
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const login = require('./Router/Auth')
+
 // const Article = require('./models/Article');
 dotenv.config()
 const MONGO_URI = process.env.MONGO_URI
@@ -12,6 +14,7 @@ app.use(express())
 app.use(express.json())
 app.use(bodyParser.json())
 
+app.use("/articles",login)
 
 mongoose.connect(MONGO_URI)
     .then(
