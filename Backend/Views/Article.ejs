@@ -1,0 +1,19 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+</head>
+<body class="">
+    <h1 class="">Welcome to <%= title %></h1>
+
+    <form action="/mern/image" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" /> <button type="submit">upload</button>
+        </br><input type="text" name="ArticleName" />
+        </br><input type="text" name="Description" />
+        <!-- </br><input type="text" name="Comments[userName]" />
+        </br><input type="text" name="Comments[message]" /> -->
+        </br > <button type="submit">submit</button>
+    </form>
+</body>
+</html>

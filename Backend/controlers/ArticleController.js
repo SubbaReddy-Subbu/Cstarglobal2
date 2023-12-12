@@ -1,35 +1,5 @@
 const Article = require('../models/Article')
 
-const addArticle = async (req, res) => {
-    const newArticle = req.body;
-    const articleName = newArticle.ArticleName;
-    const Description = newArticle.Description;
-    const message = newArticle.Comments.message;
-    const userName = newArticle.Comments.userName;
-
-    try {
-        // Check if the article already exists
-        const existingArticle = await Article.findOne({ArticleName:  articleName});
-        console.log(existingArticle)
-        if (existingArticle) {
-            res.status(409).json({
-                message: "Article already exists",
-                existingArticle 
-            });
-        } else {
-            // If the article does not exist, save the new article
-            const createdArticle = await Article.create({ ArticleName: articleName,Description :Description,  comments: [{userName : userName ,message : message}] });
-
-            res.status(201).json({
-                message: "Article created successfully",
-                newArticle: createdArticle
-            });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-}
 
 const addcomments =async(req,res)=>{
     const {userName , message } = req.body
@@ -72,6 +42,22 @@ const getArticle = async (req,res)=>{
 
 
 }
+const getComments = async(req,res)=>{
+    const ArticleName = req.params.name
+    try{
+    const existingArticle = await Article.findOne({ArticleName:  ArticleName});
+     if(existingArticle){
+    res.status(200).json(existingArticle.comments)
+     }else {
+        res.status(404).json({ message: "Article not found" });
+    }
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+}
+
+}
+
 const deleteArticle = async(req,res)=>{
     const Article_Name = req.params.name
     const deletedArticle = await Article.findOneAndDelete({ArticleName:  Article_Name});
@@ -111,4 +97,4 @@ const removeComment = async (req, res) => {
     }
 };
 
-module.exports = {addArticle,addcomments,getArticles,getArticle,deleteArticle ,removeComment}
+module.exports = {addcomments,getComments,getArticles,getArticle,deleteArticle ,removeComment}

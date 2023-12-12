@@ -15,7 +15,14 @@ const ArticleShema = new mongoose.Schema({
     },
     comments: { 
         type: Array, 
-        default: [comments] 
+        default: [ {userName: {
+            type: String,
+            required: true,
+        },
+        message: {
+            type: String,
+            required: true,
+        }}] 
     }
 })
 
