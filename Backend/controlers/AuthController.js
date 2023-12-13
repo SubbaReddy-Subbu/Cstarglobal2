@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv').config()
+const bcrypt = require('bcrypt');
+const saltRounds = 10; 
 
 const SecreteKey = process.env.SECRETEKEY
 
@@ -23,13 +25,13 @@ const Login = async (req, res) => {
         const existingUser = await User.findOne({ email: email });
 
         if (existingUser) {
-            const verify = existingUser.password === password;
+            const verify = await bcrypt.compare(password, existingUser.password);
 
             if (verify) {
                 const tokenUser ={name :  existingUser.userName }
-                const accessToken = jwt.sign(tokenUser,SecreteKey);
+                const Authorization = jwt.sign(tokenUser,SecreteKey);
 
-                res.status(200).json({ message: `Welcome ${existingUser.userName}`,accessToken });
+                res.status(200).json({ message: `Welcome ${existingUser.userName}`,Authorization });
             } else {
                 res.status(403).json({ message: "Incorrect details" });
             }
@@ -49,9 +51,16 @@ const Register = async (req, res) => {
         const existingUser = await User.findOne({ email: email });
 
         if (!existingUser) {
-            const newUser = await User.create({ userName, email, password });
-            res.status(201).json({ message: `User ${userName} created successfully` });
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+            const newUser = new User({
+                userName,
+                email,
+                password: hashedPassword, // Store the hashed password
+            });
             await newUser.save()
+            res.status(201).json({ message: `User ${userName} created successfully` });
+           
         } else {
             res.status(409).json({ message: "User already exists" });
         }
